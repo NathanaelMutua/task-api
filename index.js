@@ -15,7 +15,11 @@ app.get("/", (req, res) => {
 // this endpoint will have a function that will get all tasks from the database
 app.get("/tasks", async (_req, res) => {
   try {
-    const task = await prisma.task.findMany();
+    const task = await prisma.task.findMany({
+      where: {
+        isCompleted: false
+      }
+    });
     res.status(200).json(task).send(`<h1>Fetched All Tasks</h1>`);
   } catch (e) {
     res.status(404).json("Something Went Wrong!").send(`<h1 style="text-align: center;">Something Went Wrong Bruv!</h1>`);
@@ -44,9 +48,10 @@ app.post("/tasks", async(req, res) => {
 app.get("/tasks/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const requestedTask = await prisma.task.findUnique({
+    const requestedTask = await prisma.task.findFirst({
       where: {
-        id: id
+        id: id,
+        isCompleted: false
       }
     });
     if (requestedTask) {
@@ -79,6 +84,24 @@ app.patch("/tasks/:id", async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
+
+// route to delete a task
+app.delete("/tasks/:id", async (req, res) => {
+  try{
+    const { id } = req.params;
+    const deleteTask = await prisma.task.update({
+      where: {
+        id
+      },
+      data: {
+        isCompleted: true
+      }
+    })
+    res.status(200).json({ message: "Task Deleted!" })
+  } catch (e) {
+    res.status(500).json({ message: "Something Went Wrong!" })
+  }
+})
 
 const port = process.env.PORT || 7000;
 
