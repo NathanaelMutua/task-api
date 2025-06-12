@@ -1,5 +1,5 @@
 import express from 'express'
-import { tasks } from './tasks';
+import { tasks } from './tasks.js';
 
 const app = express();
 
@@ -11,8 +11,15 @@ app.get("/", (req, res) => {
     `) // This will be displayed the moment we run the link
 })
 
-app.get("/tasks", (req, res) => {
-    res.send(tasks);
+app.get("/tasks", (_req, res) => {
+    try{
+        res.status(200).json(task);
+    } catch (e) {
+        res.send(
+            `<h1 style="text-align: center;">Something Went Wrong Bruv!</h1>`
+        )
+        res.status(404).json("Something Went Wrong!")
+    }
 })
 
 const port = process.env.PORT || 7000;
