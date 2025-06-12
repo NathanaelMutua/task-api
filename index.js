@@ -60,6 +60,26 @@ app.get("/tasks/:id", async (req, res) => {
   }
 });
 
+// this endpoint will have a function to update a task
+app.patch("/tasks/:id", async (req, res) => {
+  const { id } = req.params;
+  const {title, description} = req.body || {};
+  try {
+    let updatedTask = await prisma.task.update({
+      where: {
+        id
+      },
+      data: {
+        title: title && title,
+        description: description && description
+      }
+    });
+    res.status(200).json({ message:"Task Updated", updatedTask});
+  } catch (e) {
+    res.status(500).json({ message: "Something went wrong" });
+  }
+});
+
 const port = process.env.PORT || 7000;
 
 app.listen(port, () => {
