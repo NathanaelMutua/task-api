@@ -6,10 +6,16 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model task{
+  id String @id @default(uuid()) @map("task_id")
+  title String @map("task_title")
+  description String @map("task_description")
+  isCompleted Boolean @default(false) @map("task_completed")
 }
