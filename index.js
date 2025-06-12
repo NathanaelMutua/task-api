@@ -12,7 +12,8 @@ app.get("/", (req, res) => {
   res.send(`<body style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh"><h1>This is a simple Task API</h1><p>This project handles HTTP requests with endpoints.</p><hr><p>By Nash</p></body>`); // This will be displayed the moment we run the link
 });
 
-app.get("/tasks", async (req, res) => {
+// this endpoint will have a function that will get all tasks from the database
+app.get("/tasks", async (_req, res) => {
   try {
     const task = await prisma.task.findMany();
     res.status(200).json(task).send(`<h1>Fetched All Tasks</h1>`);
@@ -21,6 +22,8 @@ app.get("/tasks", async (req, res) => {
   }
 });
 
+
+// this function will add a post, I am using postman so the body input will be used to generate random values
 app.post("/tasks", async(req, res) => {
     try{
         const {title, description} = req.body;
@@ -36,6 +39,26 @@ app.post("/tasks", async(req, res) => {
         console.log("We have an error!")
     }
 })
+
+// this endpoint will have a function that will get a specific task based on the ID
+app.get("/tasks/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const requestedTask = await prisma.task.findUnique({
+      where: {
+        id: id
+      }
+    });
+    if (requestedTask) {
+      res.status(200).json(requestedTask);
+    } else {
+      res.status(404).json({ message: "Task Was Not Found!" });
+    }
+  } catch (e) {
+    res.status(500).json({ message: "Something went wrong" });
+    console.log("We have an error!");
+  }
+});
 
 const port = process.env.PORT || 7000;
 
